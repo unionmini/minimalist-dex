@@ -1,0 +1,15 @@
+TN:
+SF:src/Counter.sol
+FN:11,Counter.increment
+FN:7,Counter.setNumber
+FNDA:1,Counter.increment
+FNDA:258,Counter.setNumber
+FNF:2
+FNH:2
+DA:7,258
+DA:8,258
+DA:11,1
+DA:12,1
+LF:4
+LH:4
+end_of_record
