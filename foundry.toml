@@ -5,7 +5,7 @@ libs = ["node_modules", "lib"]
 evm_version = "cancun"
 optimizer = true
 optimizer_runs = 10_000_000
-solc = "0.8.25"
+solc = "0.5.16"
 verbosity = 3
 
 [profile.ci]
