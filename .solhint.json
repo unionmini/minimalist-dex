@@ -2,7 +2,7 @@
   "extends": "solhint:recommended",
   "plugins": [],
   "rules": {
-    "compiler-version": ["error", "^0.5.0"],
+    "compiler-version": ["error", "^0.8.0"],
     "code-complexity": "warn",
     "const-name-snakecase": "warn",
     "function-max-lines": "warn",
@@ -15,7 +15,6 @@
     "reason-string": ["warn", { "maxLength": 64 }],
     "func-name-mixedcase": "off",
     "custom-errors": "off",
-    "no-inline-assembly": "off",
-    "no-global-import": "off"
+    "no-inline-assembly": "off"
   }
 }
