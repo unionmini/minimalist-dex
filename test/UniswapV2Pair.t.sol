@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import "forge-std/Test.sol";
-import "../src/UniswapV2Pair.sol";
-import "../src/UniswapV2Factory.sol";
-import "./mocks/ERC20.sol";
+import {Test} from "forge-std/Test.sol";
+import {UniswapV2Pair} from "../src/UniswapV2Pair.sol";
+import {UniswapV2Factory} from "../src/UniswapV2Factory.sol";
+import {ERC20} from "./mocks/ERC20.sol";
 
 contract UniswapV2PairTest is Test {
-    UniswapV2Factory factory;
-    ERC20 token0;
-    ERC20 token1;
-    UniswapV2Pair pair;
+    UniswapV2Factory public factory;
+    ERC20 public token0;
+    ERC20 public token1;
+    UniswapV2Pair public pair;
 
-    address wallet = address(this);
-    address other = address(0x1);
+    address public wallet = address(this);
+    address public other = address(0x1);
 
-    uint256 constant MINIMUM_LIQUIDITY = 10 ** 3;
+    uint256 public constant MINIMUM_LIQUIDITY = 10 ** 3;
+    uint256 public constant TEST_AMOUNT = 10 * 10 ** 18;
 
     function setUp() public {
         factory = new UniswapV2Factory(wallet);
@@ -108,6 +109,42 @@ contract UniswapV2PairTest is Test {
         assertEq(pair.totalSupply(), MINIMUM_LIQUIDITY);
         assertEq(token0.balanceOf(address(pair)), 1000);
         assertEq(token1.balanceOf(address(pair)), 1000);
+    }
+
+    function testTransferFrom() public {
+        pair.approve(other, TEST_AMOUNT);
+
+        addLiquidity(10000 * 10 ** 18, 10000 * 10 ** 18);
+
+        vm.prank(other);
+        assertTrue(pair.transferFrom(wallet, other, TEST_AMOUNT));
+
+        assertEq(pair.allowance(wallet, other), 0);
+        assertEq(pair.balanceOf(other), TEST_AMOUNT);
+    }
+
+    function testPermit() public {
+        uint256 privateKey = 0xBEEF;
+        address owner = vm.addr(privateKey);
+
+        uint256 nonce = pair.nonces(owner);
+        uint256 deadline = type(uint256).max;
+
+        bytes32 domainSeparator = pair.DOMAIN_SEPARATOR();
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainSeparator,
+                keccak256(abi.encode(pair.PERMIT_TYPEHASH(), owner, other, TEST_AMOUNT, nonce, deadline))
+            )
+        );
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
+
+        pair.permit(owner, other, TEST_AMOUNT, deadline, v, r, s);
+
+        assertEq(pair.allowance(owner, other), TEST_AMOUNT);
+        assertEq(pair.nonces(owner), 1);
     }
 
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);

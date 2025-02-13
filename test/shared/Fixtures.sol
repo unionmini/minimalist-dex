@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../../src/UniswapV2Factory.sol";
-import "../../src/UniswapV2Pair.sol";
-import "../mocks/ERC20.sol";
-import "./Utilities.sol";
+import {UniswapV2Factory} from "../../src/UniswapV2Factory.sol";
+import {UniswapV2Pair} from "../../src/UniswapV2Pair.sol";
+import {ERC20} from "../mocks/ERC20.sol";
+import {Utilities} from "./Utilities.sol";
 
 contract Fixtures {
     using Utilities for uint256;

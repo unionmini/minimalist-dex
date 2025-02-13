@@ -44,10 +44,10 @@ coverage-html:
 	@echo "Running coverage..."
 	forge coverage --report lcov --fork-url ${FORK_URL}
 	@if [ "`uname`" = "Darwin" ]; then \
-		lcov --ignore-errors inconsistent --remove lcov.info 'script/*' 'test/*' 'src/test/*' --output-file lcov.info; \
+		lcov --ignore-errors inconsistent --remove lcov.info 'script/*' 'test/*' 'src/test/*' 'src/libraries/*' --output-file lcov.info; \
 		genhtml --ignore-errors inconsistent -o coverage-report lcov.info; \
 	else \
-		lcov --remove lcov.info 'script/*' 'test/*' 'src/test/*' --output-file lcov.info; \
+		lcov --remove lcov.info 'script/*' 'test/*' 'src/test/*' 'src/libraries/*' --output-file lcov.info; \
 		genhtml -o coverage-report lcov.info; \
 	fi
 	@echo "Coverage report generated at coverage-report/index.html"

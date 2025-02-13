@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import "forge-std/Test.sol";
-import "../src/UniswapV2Factory.sol";
-import "../src/UniswapV2Pair.sol";
+import {Test} from "forge-std/Test.sol";
+import {UniswapV2Factory} from "../src/UniswapV2Factory.sol";
+import {UniswapV2Pair} from "../src/UniswapV2Pair.sol";
 
 contract UniswapV2FactoryTest is Test {
-    UniswapV2Factory factory;
-    address wallet = address(this);
-    address other = address(0x1);
+    UniswapV2Factory public factory;
+    address public wallet = address(this);
+    address public other = address(0x1);
 
-    address constant TEST_ADDR_1 = address(0x1000000000000000000000000000000000000000);
-    address constant TEST_ADDR_2 = address(0x2000000000000000000000000000000000000000);
+    address public constant TEST_ADDR_1 = address(0x1000000000000000000000000000000000000000);
+    address public constant TEST_ADDR_2 = address(0x2000000000000000000000000000000000000000);
 
     function setUp() public {
         factory = new UniswapV2Factory(wallet);
