@@ -12,6 +12,9 @@
     "avoid-sha3": "warn",
     "not-rely-on-time": "off",
     "private-vars-leading-underscore": "off",
-    "reason-string": ["warn", { "maxLength": 64 }]
+    "reason-string": ["warn", { "maxLength": 64 }],
+    "func-name-mixedcase": "off",
+    "custom-errors": "off",
+    "no-inline-assembly": "off"
   }
 }
