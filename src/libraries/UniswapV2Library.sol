@@ -1,12 +1,8 @@
 pragma solidity ^0.8.0;
 
-import "../interfaces/IUniswapV2Pair.sol";
-
-import "./SafeMath.sol";
+import {IUniswapV2Pair} from "../interfaces/IUniswapV2Pair.sol";
 
 library UniswapV2Library {
-    using SafeMath for uint256;
-
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
     function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
         require(tokenA != tokenB, "UniswapV2Library: IDENTICAL_ADDRESSES");
@@ -25,7 +21,8 @@ library UniswapV2Library {
                             hex"ff",
                             factory,
                             keccak256(abi.encodePacked(token0, token1)),
-                            hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
+                            hex"3891d3d82f71da5c67bef8d70a7d3644cb9ad05d9540680e78ab1364ae96a550" // init code hash
+                                // hex"283f5aaf7038e601ac2a12f0b8bf425da225bc65db9d39633bfa544cc597d151"
                         )
                     )
                 )
@@ -48,7 +45,7 @@ library UniswapV2Library {
     function quote(uint256 amountA, uint256 reserveA, uint256 reserveB) internal pure returns (uint256 amountB) {
         require(amountA > 0, "UniswapV2Library: INSUFFICIENT_AMOUNT");
         require(reserveA > 0 && reserveB > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
-        amountB = amountA.mul(reserveB) / reserveA;
+        amountB = amountA * reserveB / reserveA;
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
@@ -59,9 +56,9 @@ library UniswapV2Library {
     {
         require(amountIn > 0, "UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT");
         require(reserveIn > 0 && reserveOut > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
-        uint256 amountInWithFee = amountIn.mul(997);
-        uint256 numerator = amountInWithFee.mul(reserveOut);
-        uint256 denominator = reserveIn.mul(1000).add(amountInWithFee);
+        uint256 amountInWithFee = amountIn * 997;
+        uint256 numerator = amountInWithFee * reserveOut;
+        uint256 denominator = reserveIn * 1000 + amountInWithFee;
         amountOut = numerator / denominator;
     }
 
@@ -73,9 +70,9 @@ library UniswapV2Library {
     {
         require(amountOut > 0, "UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT");
         require(reserveIn > 0 && reserveOut > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
-        uint256 numerator = reserveIn.mul(amountOut).mul(1000);
-        uint256 denominator = reserveOut.sub(amountOut).mul(997);
-        amountIn = (numerator / denominator).add(1);
+        uint256 numerator = reserveIn * amountOut * 1000;
+        uint256 denominator = reserveOut * 997 - amountOut * 997;
+        amountIn = (numerator / denominator) + 1;
     }
 
     // performs chained getAmountOut calculations on any number of pairs

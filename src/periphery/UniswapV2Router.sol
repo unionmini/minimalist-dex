@@ -1,17 +1,13 @@
 pragma solidity 0.8.25;
 
-import "../interfaces/IUniswapV2Factory.sol";
-import "../libraries/TransferHelper.sol";
-
-import "../interfaces/IUniswapV2Router02.sol";
-import "../libraries/UniswapV2Library.sol";
-import "../libraries/SafeMath.sol";
-import "../interfaces/IERC20.sol";
-import "../interfaces/IWETH.sol";
+import {IUniswapV2Factory} from "../interfaces/IUniswapV2Factory.sol";
+import {TransferHelper} from "../libraries/TransferHelper.sol";
+import {IUniswapV2Router02} from "../interfaces/IUniswapV2Router02.sol";
+import {UniswapV2Library, IUniswapV2Pair} from "../libraries/UniswapV2Library.sol";
+import {IERC20} from "../interfaces/IERC20.sol";
+import {IWETH} from "../interfaces/IWETH.sol";
 
 contract UniswapV2Router02 is IUniswapV2Router02 {
-    using SafeMath for uint256;
-
     address public immutable override factory;
     address public immutable override WETH;
 
@@ -113,7 +109,8 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         uint256 deadline
     ) public virtual override ensure(deadline) returns (uint256 amountA, uint256 amountB) {
         address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
-        IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
+        bool success = IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
+        require(success, "UniswapV2Router: TRANSFER_FAILED");
         (uint256 amount0, uint256 amount1) = IUniswapV2Pair(pair).burn(to);
         (address token0,) = UniswapV2Library.sortTokens(tokenA, tokenB);
         (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
@@ -338,7 +335,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
                 (uint256 reserve0, uint256 reserve1,) = pair.getReserves();
                 (uint256 reserveInput, uint256 reserveOutput) =
                     input == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
-                amountInput = IERC20(input).balanceOf(address(pair)).sub(reserveInput);
+                amountInput = IERC20(input).balanceOf(address(pair)) - reserveInput;
                 amountOutput = UniswapV2Library.getAmountOut(amountInput, reserveInput, reserveOutput);
             }
             (uint256 amount0Out, uint256 amount1Out) =
@@ -361,7 +358,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         _swapSupportingFeeOnTransferTokens(path, to);
         require(
-            IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,
+            (IERC20(path[path.length - 1]).balanceOf(to) - balanceBefore) >= amountOutMin,
             "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
         );
     }
@@ -379,7 +376,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         _swapSupportingFeeOnTransferTokens(path, to);
         require(
-            IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,
+            (IERC20(path[path.length - 1]).balanceOf(to) - balanceBefore) >= amountOutMin,
             "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
         );
     }
